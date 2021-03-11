@@ -1,0 +1,14 @@
+{
+    "require": {
+        "google/cloud-translate": "^1.10",
+        "akeneo/api-php-client-ee": "^6.0",
+        "php-http/guzzle6-adapter": "^2.0",
+        "http-interop/http-factory-guzzle": "^1.0",
+        "vlucas/phpdotenv": "^5.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}
