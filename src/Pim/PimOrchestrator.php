@@ -13,6 +13,12 @@ class PimOrchestrator
 {
     const TYPE_PRODUCT_MODELS = 'ProductModel';
     const TYPE_PRODUCTS = 'Product';
+    const PARAM_ATTRIBUTES = 'attributes';
+    const PARAM_SCOPE_SOURCE = 'scope_source';
+    const PARAM_SCOPE_DESTINATION = 'scope_destination';
+    const PARAM_LOCALE_SOURCE = 'locale_source';
+    const PARAM_LOCALE_DESTINATION = 'locale_destination';
+    const PARAM_CATEGORIES_SOURCE = 'categories_source';
 
     private $client;
 
@@ -20,11 +26,22 @@ class PimOrchestrator
 
     private $pimAttributes = [];
 
+    private $params = [];
+
     /**
      * PimOrchestrator constructor.
      */
     public function __construct()
     {
+        $this->params = [
+            static::PARAM_LOCALE_SOURCE => $_SERVER['LOCALE_SOURCE'],
+            static::PARAM_LOCALE_DESTINATION => $_SERVER['LOCALE_DESTINATION'],
+            static::PARAM_ATTRIBUTES => explode(',', $_SERVER['TARGET_ATTRIBUTES']),
+            static::PARAM_SCOPE_SOURCE => $_SERVER['SCOPE_SOURCE'],
+            static::PARAM_CATEGORIES_SOURCE => explode(',',$_SERVER['CATEGORIES_SOURCE']),
+            static::PARAM_SCOPE_DESTINATION => $_SERVER['SCOPE_DESTINATION'],
+        ];
+
         $clientBuilder = new AkeneoPimEnterpriseClientBuilder($_SERVER['PIM_URL']);
         $this->client = $clientBuilder->buildAuthenticatedByPassword(
             $_SERVER['PIM_API_CLIENT_ID'],
@@ -43,27 +60,33 @@ class PimOrchestrator
      * @param $targetLocale
      * @return array
      */
-    public function retrieveProductTypeTotranslateForAttributes($type, $attributes, $scope, $sourceLocale, $targetLocale)
+    public function retrieveProductTypeTotranslateForAttributes($type)
     {
         $products = [];
-        foreach($attributes as $attribute) {
+        foreach($this->params[static::PARAM_ATTRIBUTES] as $attribute) {
             echo "Search For attribute $attribute...\n";
-            $searchBuilder = new SearchBuilder();
+            // put attribute informations in cache
             $this->pimAttributes[$attribute] = $this->client->getAttributeApi()->get($attribute);
-            $searchBuilder->addFilter($attribute, "NOT EMPTY", null, ['scope' => $this->pimAttributes[$attribute]['scopable'] ? $scope : null, 'locale' => $sourceLocale]);
-            $searchBuilder->addFilter($attribute, "EMPTY", null, ['scope' => $this->pimAttributes[$attribute]['scopable'] ? $scope : null , 'locale' => $targetLocale]);
+
+            $searchBuilder = new SearchBuilder();
+
+            $searchBuilder->addFilter($attribute, "NOT EMPTY", null, ['scope' => $this->pimAttributes[$attribute]['scopable'] ? $this->params[static::PARAM_SCOPE_SOURCE] : null, 'locale' => $this->params[static::PARAM_LOCALE_SOURCE]]);
+            $searchBuilder->addFilter($attribute, "EMPTY", null, ['scope' => $this->pimAttributes[$attribute]['scopable'] ? $this->params[static::PARAM_SCOPE_SOURCE] : null , 'locale' => $this->params[static::PARAM_LOCALE_DESTINATION]]);
+
             if($type == static::TYPE_PRODUCTS) {
                 $searchBuilder->addFilter('enabled', "=", true);
             }
-
+            if('' !== $this->params[self::PARAM_CATEGORIES_SOURCE]) {
+                $searchBuilder->addFilter('categories', "IN", $this->params[self::PARAM_CATEGORIES_SOURCE]);
+            }
             $searchFilters = $searchBuilder->getFilters();
 
             $response = $this->client->{'get'.$type.'Api'}()->all(
                 "100",
                 [
                     "search" => $searchFilters,
-                    'scope' => $scope,
-                    'attributes' => implode(',', $attributes)
+                    'scope' => $this->params[static::PARAM_SCOPE_SOURCE],
+                    'attributes' => implode(',', $this->params[static::PARAM_ATTRIBUTES])
                 ]
             );
 
@@ -84,14 +107,14 @@ class PimOrchestrator
      * @param $sourceLocale
      * @param $targetLocale
      */
-    public function translateProductsTypeForAttributes($type, $attributes, $scope, $sourceLocale, $targetLocale)
+    public function translateProductsTypeForAttributes($type)
     {
-        $targetLanguage = substr($targetLocale,0, strpos($targetLocale, '_'));
+        $targetLanguage = substr($this->params[static::PARAM_LOCALE_DESTINATION],0, strpos($this->params[static::PARAM_LOCALE_DESTINATION], '_'));
         $updatedProducts = [];
 
         echo "Search for $type...";
 
-        $list = $this->retrieveProductTypeTotranslateForAttributes($type, $attributes, $scope, $sourceLocale, $targetLocale);
+        $list = $this->retrieveProductTypeTotranslateForAttributes($type);
 
         echo count($list)." $type to process\n";
 
@@ -99,16 +122,16 @@ class PimOrchestrator
 
             $toTranslate = [];
 
-            foreach($attributes as $keyAttr => $attribute) {
+            foreach($this->params[static::PARAM_ATTRIBUTES] as $keyAttr => $attribute) {
                 if(isset($product['values'][$attribute])) {
                     foreach ($product['values'][$attribute] as $val) {
-                        if ($val['locale'] == $sourceLocale) {
+                        if ($val['locale'] == $this->params[static::PARAM_LOCALE_SOURCE]) {
                             $toTranslate[] = $val['data'];
                             break;
                         }
                     }
                 } else {
-                    unset($attributes[$keyAttr]);
+                    unset($this->params[static::PARAM_ATTRIBUTES][$keyAttr]);
                 }
             }
 
@@ -123,11 +146,11 @@ class PimOrchestrator
                 $updatedProducts[$productIdentifier] = [];
 
                 $indice = 0;
-                foreach($attributes as $attribute) {
+                foreach($this->params[static::PARAM_ATTRIBUTES] as $attribute) {
                     $updatedProducts[$productIdentifier]['values'][$attribute][] = [
                         'data' => $translated[$indice],
-                        'locale' => $targetLocale,
-                        'scope' => $this->pimAttributes[$attribute]['scopable'] ? $scope : null,
+                        'locale' => $this->params[static::PARAM_LOCALE_DESTINATION],
+                        'scope' => $this->pimAttributes[$attribute]['scopable'] ? $this->params[static::PARAM_SCOPE_DESTINATION] : null,
                     ];
                     $indice++;
                 }

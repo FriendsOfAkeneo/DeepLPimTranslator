@@ -8,14 +8,9 @@ $dotenv->load();
 
 putenv('GOOGLE_APPLICATION_CREDENTIALS='.dirname(__FILE__).'/'.$_SERVER['GOOGLE_TRANSLATE_CREDENTIALS_FILENAME']);
 
-$sourceLocale = $_SERVER['LOCALE_SOURCE'];
-$targetLocale = $_SERVER['LOCALE_DESTINATION'];
-$targetAttributes = explode(',', $_SERVER['TARGET_ATTRIBUTES']);
-$scope = $_SERVER['SCOPE_DESTINATION'];
-
 $pimOrchestrator = new PimOrchestrator();
 
-$pimOrchestrator->translateProductsTypeForAttributes(PimOrchestrator::TYPE_PRODUCT_MODELS, $targetAttributes, $scope, $sourceLocale, $targetLocale);
-$pimOrchestrator->translateProductsTypeForAttributes(PimOrchestrator::TYPE_PRODUCTS, $targetAttributes, $scope, $sourceLocale, $targetLocale);
+$pimOrchestrator->translateProductsTypeForAttributes(PimOrchestrator::TYPE_PRODUCT_MODELS);
+$pimOrchestrator->translateProductsTypeForAttributes(PimOrchestrator::TYPE_PRODUCTS);
 
 
