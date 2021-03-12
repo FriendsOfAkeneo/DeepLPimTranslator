@@ -6,7 +6,7 @@ use App\Pim\PimOrchestrator;
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__, '.env');
 $dotenv->load();
 
-putenv('GOOGLE_APPLICATION_CREDENTIALS='.dirname(__FILE__).'/akecld-akeneo-presales-team-454cfe6d737b.json');
+putenv('GOOGLE_APPLICATION_CREDENTIALS='.dirname(__FILE__).'/'.$_SERVER['GOOGLE_TRANSLATE_CREDENTIAL_FILE']);
 
 $sourceLocale = $_SERVER['LOCALE_SOURCE'];
 $targetLocale = $_SERVER['LOCALE_DESTINATION'];
