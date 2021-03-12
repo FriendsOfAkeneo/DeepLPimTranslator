@@ -13,7 +13,7 @@
     },
     "scripts": {
         "post-update-cmd":  [
-            "php -r \"copy('.env.dist', '.env');\""
+            "php -r \"if(!file_exists('.env'))copy('.env.dist', '.env');\""
         ]
     }
 }
