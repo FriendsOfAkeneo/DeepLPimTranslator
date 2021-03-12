@@ -17,10 +17,12 @@ class GoogleTranslator
 
     public function translate($values = [], $localeTo)
     {
+        $credentialfile = file_get_contents(getenv('GOOGLE_APPLICATION_CREDENTIALS'));
+        $jsonCredentials = json_decode($credentialfile);
         $response = $this->client->translateText(
             $values,
             $localeTo,
-            TranslationServiceClient::locationName('akecld-akeneo-presales-team', 'global')
+            TranslationServiceClient::locationName($jsonCredentials->project_id, 'global')
         );
 
         $translated=[];
