@@ -1,24 +1,24 @@
-# google_translate_middleware
+# Google Translate middleware
 A PHP CLI tool to automate translations for PIM translatable attributes through Google Translate API
 
-# Technical requirements
+## Technical requirements
 PHP 7.3 (minimal) installed locally
 Or
 Docker
 
-# 1.Installation
+## 1.Installation
 
-## 1.1 with PHP locally
+### 1.1 with PHP locally
 run `PHP composer update`
 
-## 1.2 trough Docker
+### 1.2 trough Docker
 Start the container
 `docker-compose up -d`
 
 Then run
 `docker-compose exec fpm composer update`
 
-# 2.Configuration
+## 2.Configuration
 
 Before running the tool, you must set each environment variables listed inside the .env file situated at the root of the project
 
@@ -42,12 +42,12 @@ SCOPE_DESTINATION=ecommerce
 TARGET_ATTRIBUTES=description,short_description
 ```
 
-# 3. Run translator
+## 3. Run translator
 
-## 3.1 with PHP locally
+### 3.1 with PHP locally
 run `php translate.php`
 
-## 3.2 trough Docker
+### 3.2 trough Docker
 Start the container if not yet started
 `docker-compose up -d`
 
