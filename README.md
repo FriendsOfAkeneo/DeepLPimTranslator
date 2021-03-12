@@ -8,10 +8,16 @@ Docker
 
 ## 1.Installation
 
-### 1.1 with PHP locally
+open a command line shell.
+
+Clone this repository : `git clone git@github.com:akeneo-presales/google_translate_middleware.git`
+
+then go inside the project folder : `cd google_translate_middleware`
+
+### 1.1 install the dependencies with PHP locally
 run `PHP composer update`
 
-### 1.2 trough Docker
+### 1.2 install the dependencies trough Docker
 Start the container
 `docker-compose up -d`
 
@@ -42,7 +48,7 @@ SCOPE_DESTINATION=ecommerce
 TARGET_ATTRIBUTES=description,short_description
 ```
 
-## 3. Run translator
+## 3. Run the translator tool
 
 ### 3.1 with PHP locally
 run `php translate.php`
