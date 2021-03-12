@@ -62,7 +62,8 @@ class PimOrchestrator
                 "100",
                 [
                     "search" => $searchFilters,
-                    'scope' => $scope
+                    'scope' => $scope,
+                    'attributes' => implode(',', $attributes)
                 ]
             );
 
