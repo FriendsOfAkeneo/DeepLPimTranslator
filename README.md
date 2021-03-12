@@ -47,8 +47,10 @@ Then you have to configure the locales source and destination for the translatio
 LOCALE_SOURCE=en_US
 LOCALE_DESTINATION=fr_FR
 ```
-Finally set the scope and the targeted attribute(s) separated by a comma
+Finally set the categories  (separated by a comma - optionnal parameter), the source and destinations scopes for source and destination (could be the same for each of them) and the targeted attribute(s) (separated by a comma)
 ```
+CATEGORIES_SOURCE=
+SCOPE_SOURCE=ecommerce
 SCOPE_DESTINATION=ecommerce
 TARGET_ATTRIBUTES=description,short_description
 ```
