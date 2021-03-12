@@ -1,10 +1,20 @@
-version: '3'
-
+version: '3.4'
 services:
-  fpm:
-    image: 'akeneo/fpm:php-7.3'
-    user: 'docker'
+  php:
+    image: 'akeneo/pim-php-dev:5.0'
+    user: 'www-data'
+    environment:
+      APP_ENV: '${APP_ENV:-prod}'
+      COMPOSER_HOME: '/var/www/.composer'
+      PHP_IDE_CONFIG: 'serverName=translate'
     volumes:
-      - './:/srv/pim'
-    working_dir: '/srv/pim'
+      - './:/srv/translate'
+      - '${HOST_COMPOSER_HOME:-~/.composer}:/var/www/.composer'
+      - '${HOST_COMPOSER_HOME:-~/.ssh}:/var/www/.ssh'
+    working_dir: '/srv/translate'
+    command: 'tail -f composer.json'
+    networks:
+      - 'translate'
 
+networks:
+  translate:

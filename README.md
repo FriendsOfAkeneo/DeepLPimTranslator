@@ -25,7 +25,7 @@ Start the container
 `docker-compose up -d`
 
 Then run
-`docker-compose exec fpm composer update`
+`docker-compose exec php composer update`
 
 ## 2.Configuration
 
@@ -61,7 +61,7 @@ Start the container if not yet started
 `docker-compose up -d`
 
 Then run
-`docker-compose exec fpm php translate.php`
+`docker-compose exec php php translate.php`
 
 
 
