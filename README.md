@@ -15,7 +15,7 @@ Clone this repository : `git clone git@github.com:akeneo-presales/google_transla
 then go inside the project folder : `cd google_translate_middleware`
 
 ### 1.1 install the dependencies with PHP locally
-run `PHP composer update`
+run `php composer update`
 
 ### 1.2 install the dependencies trough Docker
 Start the container
