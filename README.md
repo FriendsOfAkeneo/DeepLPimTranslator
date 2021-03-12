@@ -2,9 +2,12 @@
 A PHP CLI tool to automate translations for PIM translatable attributes through Google Translate API
 
 ## Technical requirements
+
 PHP 7.3 (minimal) installed locally
+
 Or
-Docker
+
+Docker, see here for installing it on your computer ➡️ https://docs.docker.com/desktop/#download-and-install
 
 ## 1.Installation
 
