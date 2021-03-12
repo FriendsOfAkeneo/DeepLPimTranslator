@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  fpm:
+    image: 'akeneo/fpm:php-7.3'
+    user: 'docker'
+    volumes:
+      - './:/srv/pim'
+    working_dir: '/srv/pim'
+
