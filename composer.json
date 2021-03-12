@@ -10,5 +10,10 @@
         "psr-4": {
             "App\\": "src/"
         }
+    },
+    "scripts": {
+        "post-update-cmd":  [
+            "php -r \"copy('.env.dist', '.env');\""
+        ]
     }
 }
