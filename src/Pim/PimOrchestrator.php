@@ -7,7 +7,7 @@ namespace App\Pim;
 use Akeneo\Pim\ApiClient\Exception\UnprocessableEntityHttpException;
 use Akeneo\Pim\ApiClient\Search\SearchBuilder;
 use Akeneo\PimEnterprise\ApiClient\AkeneoPimEnterpriseClientBuilder;
-use App\Translator\GoogleTranslator;
+use App\Translator\DeeplTranslator;
 
 class PimOrchestrator
 {
@@ -49,7 +49,7 @@ class PimOrchestrator
             $_SERVER['PIM_API_USER'],
             $_SERVER['PIM_API_PASSWORD']);
 
-        $this->translator = new GoogleTranslator();
+        $this->translator = new DeeplTranslator();
     }
 
     /**
@@ -109,6 +109,7 @@ class PimOrchestrator
      */
     public function translateProductsTypeForAttributes($type)
     {
+        $fromLanguage = substr($this->params[static::PARAM_LOCALE_SOURCE],0, strpos($this->params[static::PARAM_LOCALE_SOURCE], '_'));
         $targetLanguage = substr($this->params[static::PARAM_LOCALE_DESTINATION],0, strpos($this->params[static::PARAM_LOCALE_DESTINATION], '_'));
         $updatedProducts = [];
 
@@ -138,7 +139,7 @@ class PimOrchestrator
             if(count($toTranslate) > 0) {
                 echo $productIdentifier . ":BEFORE:". implode(';',$toTranslate) ."\n" ;
 
-                $translated = $this->translator->translate($toTranslate, $targetLanguage);
+                $translated = $this->translator->translate($toTranslate, $fromLanguage, $targetLanguage);
 
                 echo $productIdentifier . ":AFTER:". implode(';',$translated) ."\n" ;
 
