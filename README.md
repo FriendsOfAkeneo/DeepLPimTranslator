@@ -47,17 +47,24 @@ Then you have to configure the locales source and destination for the translatio
 LOCALE_SOURCE=en_US
 LOCALE_DESTINATION=fr_FR
 ```
-Finally set the categories  (separated by a comma - optionnal parameter), the source and destinations scopes for source and destination (could be the same for each of them) and the targeted attribute(s) (separated by a comma)
+Next you can set the categories  (separated by a comma - optionnal parameter), the source and destinations scopes (could be the same for each of them) and the targeted attribute(s) (separated by a comma)
 ```
 CATEGORIES_SOURCE=
 SCOPE_SOURCE=ecommerce
 SCOPE_DESTINATION=ecommerce
 TARGET_ATTRIBUTES=description,short_description
 ```
+Finnaly you have to set your Deepl API Key 
+```
+DEEPL_API_KEY=9999999999999
+```
 
 ### 2.2 Deepl Translate API Configuration
 
-WIP
+You need an authentication key to access to the API.
+You can find your key in your account settings https://www.deepl.com/pro-account. It is important to keep your key confidential. You should not put the key in Javascript code distributed publicly.
+
+If your authentication key becomes compromised, you can recreate a new key and discard the old one in your account settings https://www.deepl.com/pro-account.
 
 ## 3. Run the translator tool
 
