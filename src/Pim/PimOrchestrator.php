@@ -81,19 +81,25 @@ class PimOrchestrator
             }
             $searchFilters = $searchBuilder->getFilters();
 
-            $response = $this->client->{'get'.$type.'Api'}()->all(
-                "100",
-                [
-                    "search" => $searchFilters,
-                    'scope' => $this->params[static::PARAM_SCOPE_SOURCE],
-                    'attributes' => implode(',', $this->params[static::PARAM_ATTRIBUTES])
-                ]
-            );
+            try {
 
-            $idColumn = $type == static::TYPE_PRODUCT_MODELS ? 'code' : 'identifier';
+                $response = $this->client->{'get'.$type.'Api'}()->all(
+                    "100",
+                    [
+                        "search" => $searchFilters,
+                        'scope' => $this->params[static::PARAM_SCOPE_SOURCE],
+                        'attributes' => implode(',', $this->params[static::PARAM_ATTRIBUTES])
+                    ]
+                );
 
-            foreach ($response as $product) {
-                $products[$product[$idColumn]]['values'][$attribute] = $product['values'][$attribute];
+
+                $idColumn = $type == static::TYPE_PRODUCT_MODELS ? 'code' : 'identifier';
+
+                foreach ($response as $product) {
+                    $products[$product[$idColumn]]['values'][$attribute] = $product['values'][$attribute];
+                }
+            } catch (UnprocessableEntityHttpException $e) {
+                echo "\033[7;31m    Error : ".$e->getMessage()."\033[0m\n";
             }
         }
 
