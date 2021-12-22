@@ -1,4 +1,4 @@
-# Deepl Translate middleware
+# Deepl PIM Translator
 A PHP CLI tool to automate translations for PIM translatable attributes through Deepl Translate API
 
 ## Technical requirements
@@ -13,9 +13,9 @@ Docker, see here for installing it on your computer ➡️ https://docs.docker.c
 
 open a command line shell.
 
-Clone this repository : `git clone git@github.com:akeneo-presales/deepl_translate_middleware.git`
+Clone this repository : `git clone git@github.com:FriendsOfAkeneo/DeepLPimTranslator.git`
 
-then go inside the project folder : `cd google_translate_middleware`
+then go inside the project folder : `cd DeepLPimTranslator`
 
 ### 1.1 install the dependencies with PHP locally
 run `php composer update`
