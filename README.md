@@ -1,4 +1,4 @@
-# Deepl PIM Translator
+# DeepL PIM Translator
 A PHP CLI tool to automate translations for PIM translatable attributes through Deepl Translate API
 
 ## Technical requirements
@@ -54,12 +54,12 @@ SCOPE_SOURCE=ecommerce
 SCOPE_DESTINATION=ecommerce
 TARGET_ATTRIBUTES=description,short_description
 ```
-Finnaly you have to set your Deepl API Key 
+Finnaly you have to set your DeepL API Key 
 ```
 DEEPL_API_KEY=9999999999999
 ```
 
-### 2.2 Deepl Translate API Configuration
+### 2.2 DeepL Translate API Configuration
 
 You need an authentication key to access to the API.
 You can find your key in your account settings https://www.deepl.com/pro-account. It is important to keep your key confidential. You should not put the key in Javascript code distributed publicly.
