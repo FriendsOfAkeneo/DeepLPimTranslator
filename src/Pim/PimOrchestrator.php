@@ -4,9 +4,12 @@
 namespace App\Pim;
 
 
+use Akeneo\Pim\ApiClient\Exception\RuntimeException;
 use Akeneo\Pim\ApiClient\Exception\UnprocessableEntityHttpException;
 use Akeneo\Pim\ApiClient\Search\SearchBuilder;
+use Akeneo\Pim\ApiClient\Stream\UpsertResourceListResponse;
 use Akeneo\PimEnterprise\ApiClient\AkeneoPimEnterpriseClientBuilder;
+use App\Exception\UpsertException;
 use App\Translator\DeeplTranslator;
 
 class PimOrchestrator
@@ -38,7 +41,7 @@ class PimOrchestrator
             static::PARAM_LOCALE_DESTINATION => $_SERVER['LOCALE_DESTINATION'],
             static::PARAM_ATTRIBUTES => explode(',', $_SERVER['TARGET_ATTRIBUTES']),
             static::PARAM_SCOPE_SOURCE => $_SERVER['SCOPE_SOURCE'],
-            static::PARAM_CATEGORIES_SOURCE => explode(',',$_SERVER['CATEGORIES_SOURCE']),
+            static::PARAM_CATEGORIES_SOURCE => explode(',', $_SERVER['CATEGORIES_SOURCE']),
             static::PARAM_SCOPE_DESTINATION => $_SERVER['SCOPE_DESTINATION'],
         ];
 
@@ -63,7 +66,7 @@ class PimOrchestrator
     public function retrieveProductTypeTotranslateForAttributes($type)
     {
         $products = [];
-        foreach($this->params[static::PARAM_ATTRIBUTES] as $attribute) {
+        foreach ($this->params[static::PARAM_ATTRIBUTES] as $attribute) {
             echo "Search For attribute $attribute...\n";
             // put attribute informations in cache
             $this->pimAttributes[$attribute] = $this->client->getAttributeApi()->get($attribute);
@@ -71,19 +74,19 @@ class PimOrchestrator
             $searchBuilder = new SearchBuilder();
 
             $searchBuilder->addFilter($attribute, "NOT EMPTY", null, ['scope' => $this->pimAttributes[$attribute]['scopable'] ? $this->params[static::PARAM_SCOPE_SOURCE] : null, 'locale' => $this->params[static::PARAM_LOCALE_SOURCE]]);
-            $searchBuilder->addFilter($attribute, "EMPTY", null, ['scope' => $this->pimAttributes[$attribute]['scopable'] ? $this->params[static::PARAM_SCOPE_SOURCE] : null , 'locale' => $this->params[static::PARAM_LOCALE_DESTINATION]]);
+            $searchBuilder->addFilter($attribute, "EMPTY", null, ['scope' => $this->pimAttributes[$attribute]['scopable'] ? $this->params[static::PARAM_SCOPE_SOURCE] : null, 'locale' => $this->params[static::PARAM_LOCALE_DESTINATION]]);
 
-            if($type == static::TYPE_PRODUCTS) {
+            if ($type == static::TYPE_PRODUCTS) {
                 $searchBuilder->addFilter('enabled', "=", true);
             }
-            if('' !== $this->params[self::PARAM_CATEGORIES_SOURCE]) {
+            if ('' !== $this->params[self::PARAM_CATEGORIES_SOURCE]) {
                 $searchBuilder->addFilter('categories', "IN", $this->params[self::PARAM_CATEGORIES_SOURCE]);
             }
             $searchFilters = $searchBuilder->getFilters();
 
             try {
 
-                $response = $this->client->{'get'.$type.'Api'}()->all(
+                $response = $this->client->{'get' . $type . 'Api'}()->all(
                     "100",
                     [
                         "search" => $searchFilters,
@@ -99,7 +102,7 @@ class PimOrchestrator
                     $products[$product[$idColumn]]['values'][$attribute] = $product['values'][$attribute];
                 }
             } catch (UnprocessableEntityHttpException $e) {
-                echo "\033[7;31m    Error : ".$e->getMessage()."\033[0m\n";
+                echo "\033[7;31m    Error : " . $e->getMessage() . "\033[0m\n";
             }
         }
 
@@ -115,22 +118,22 @@ class PimOrchestrator
      */
     public function translateProductsTypeForAttributes($type)
     {
-        $fromLanguage = substr($this->params[static::PARAM_LOCALE_SOURCE],0, strpos($this->params[static::PARAM_LOCALE_SOURCE], '_'));
-        $targetLanguage = substr($this->params[static::PARAM_LOCALE_DESTINATION],0, strpos($this->params[static::PARAM_LOCALE_DESTINATION], '_'));
+        $fromLanguage = substr($this->params[static::PARAM_LOCALE_SOURCE], 0, strpos($this->params[static::PARAM_LOCALE_SOURCE], '_'));
+        $targetLanguage = substr($this->params[static::PARAM_LOCALE_DESTINATION], 0, strpos($this->params[static::PARAM_LOCALE_DESTINATION], '_'));
         $updatedProducts = [];
 
         echo "Search for $type...";
 
         $list = $this->retrieveProductTypeTotranslateForAttributes($type);
 
-        echo count($list)." $type to process\n";
+        echo count($list) . " $type to process\n";
 
         foreach ($list as $productIdentifier => $product) {
 
             $toTranslate = [];
 
-            foreach($this->params[static::PARAM_ATTRIBUTES] as $keyAttr => $attribute) {
-                if(isset($product['values'][$attribute])) {
+            foreach ($this->params[static::PARAM_ATTRIBUTES] as $keyAttr => $attribute) {
+                if (isset($product['values'][$attribute])) {
                     foreach ($product['values'][$attribute] as $val) {
                         if ($val['locale'] == $this->params[static::PARAM_LOCALE_SOURCE]) {
                             $toTranslate[] = $val['data'];
@@ -142,18 +145,18 @@ class PimOrchestrator
                 }
             }
 
-            if(count($toTranslate) > 0) {
-                echo $productIdentifier . ":BEFORE:". implode(';',$toTranslate) ."\n" ;
+            if (count($toTranslate) > 0) {
+                echo $productIdentifier . ":BEFORE:" . implode(';', $toTranslate) . "\n";
 
                 $translated = $this->translator->translate($toTranslate, $fromLanguage, $targetLanguage);
 
-                echo $productIdentifier . ":AFTER:". implode(';',$translated) ."\n" ;
+                echo $productIdentifier . ":AFTER:" . implode(';', $translated) . "\n";
 
 
                 $updatedProducts[$productIdentifier] = [];
 
                 $indice = 0;
-                foreach($this->params[static::PARAM_ATTRIBUTES] as $attribute) {
+                foreach ($this->params[static::PARAM_ATTRIBUTES] as $attribute) {
                     $updatedProducts[$productIdentifier]['values'][$attribute][] = [
                         'data' => $translated[$indice],
                         'locale' => $this->params[static::PARAM_LOCALE_DESTINATION],
@@ -177,35 +180,56 @@ class PimOrchestrator
             $toUpdate = [];
             $batchNum = 0;
             $idColumn = $type == static::TYPE_PRODUCT_MODELS ? 'code' : 'identifier';
-            foreach($products as $productIdentifier => $values) {
-                $toUpdate[]=array_merge([$idColumn=>$productIdentifier], $values);
-                if(count($toUpdate) == 100){
+            foreach ($products as $productIdentifier => $values) {
+                $toUpdate[] = array_merge([$idColumn => (string)$productIdentifier], $values);
+                if (count($toUpdate) == 100) {
                     $batchNum++;
                     echo "Upsert $type batch $batchNum...";
-                    $this->client->{'get'.$type.'Api'}()->upsertList($toUpdate);
+                    $response = $this->client->{'get' . $type . 'Api'}()->upsertList($toUpdate);
+                    $this->checkUpsertResponse($response);
                     echo "OK\n";
                     $toUpdate = [];
                 }
             }
 
-            if(count($toUpdate) > 0){
+            if (count($toUpdate) > 0) {
                 $batchNum++;
                 echo "Upsert $type batch $batchNum...";
-                $this->client->{'get'.$type.'Api'}()->upsertList($toUpdate);
+                $response = $this->client->{'get' . $type . 'Api'}()->upsertList($toUpdate);
+                $this->checkUpsertResponse($response);
                 echo "OK\n";
             }
-        } catch (UnprocessableEntityHttpException $e) {
-            $httpCode = $e->getCode();
+        } catch (RuntimeException $e) {
             $errorMessage = $e->getMessage();
-            echo 'Error '.$httpCode.' : '.$errorMessage;
-            foreach ($e->getResponseErrors() as $error) {
-                // do your stuff with the error
-                echo $error['property'];
-                echo $error['message']."\n";
-            }
+            echo 'Error: ' . $errorMessage . "\n";
         } catch (\Exception $e) {
             var_dump($e->getMessage());
         }
+    }
 
+    protected function checkUpsertResponse($response)
+    {
+        if (is_int($response) && $response < 400) {
+            return;
+        }
+
+        if ($response instanceof UpsertResourceListResponse && $response->valid()) {
+            return;
+        }
+
+        $errors = $success = [];
+        foreach ($response as $row) {
+            if (!is_null($row) && (int)$row['status_code'] < 400) {
+                $success[] = $row;
+                continue;
+            }
+            $errors[] = $row;
+        }
+
+        if ($errors) {
+            throw new RuntimeException('The response is invalid: ' . json_encode($errors, JSON_PRETTY_PRINT));
+        }
+
+        return $success;
     }
 }
