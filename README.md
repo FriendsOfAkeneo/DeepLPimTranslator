@@ -3,7 +3,7 @@ A PHP CLI tool to automate translations for PIM translatable attributes through 
 
 ## Technical requirements
 
-PHP 7.3 (minimal) installed locally
+PHP 7.4 (minimal) installed locally
 
 Or
 
@@ -18,14 +18,16 @@ Clone this repository : `git clone git@github.com:FriendsOfAkeneo/DeepLPimTransl
 then go inside the project folder : `cd DeepLPimTranslator`
 
 ### 1.1 install the dependencies with PHP locally
-run `php composer update`
+run
+```
+php composer update
+```
 
 ### 1.2 install the dependencies trough Docker
-Start the container
-`docker-compose up -d`
-
-Then run
-`docker-compose exec php composer update`
+run
+```
+docker run -ti --rm -v $(pwd):/srv/pim -v ~/.composer:/var/www/.composer -v ~/.ssh:/var/www/.ssh -w /srv/pim akeneo/pim-php-dev:5.0 php /usr/local/bin/composer install
+```
 
 ## 2.Configuration
 
@@ -69,14 +71,17 @@ If your authentication key becomes compromised, you can recreate a new key and d
 ## 3. Run the translator tool
 
 ### 3.1 with PHP locally
-run `php translate.php`
+run
+```
+php translate.php
+```
 
 ### 3.2 trough Docker
-Start the container if not yet started
-`docker-compose up -d`
+run
+```
+docker run -ti --rm -v $(pwd):/srv/pim -v ~/.composer:/var/www/.composer -v ~/.ssh:/var/www/.ssh -w /srv/pim akeneo/pim-php-dev:5.0 php translate.php
+```
 
-Then run
-`docker-compose exec php php translate.php`
 
 
 
