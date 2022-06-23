@@ -5,7 +5,7 @@
         "php-http/guzzle6-adapter": "^2.0",
         "http-interop/http-factory-guzzle": "^1.0",
         "vlucas/phpdotenv": "^5.3",
-        "babymarkt/deepl-php-lib": "^2.0",
+        "babymarkt/deepl-php-lib": "^4.0",
         "ext-json": "*"
     },
     "autoload": {
