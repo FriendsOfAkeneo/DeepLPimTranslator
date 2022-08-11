@@ -26,7 +26,7 @@ php composer update
 ### 1.2 install the dependencies trough Docker
 run
 ```
-docker run -ti --rm -v $(pwd):/srv/pim -v ~/.composer:/var/www/.composer -v ~/.ssh:/var/www/.ssh -w /srv/pim akeneo/pim-php-dev:5.0 php /usr/local/bin/composer install
+docker run -ti --rm -v $(pwd):/srv/pim -v ~/.composer:/var/www/.composer -v ~/.ssh:/var/www/.ssh -w /srv/pim webdevops/php-dev:8.0 php /usr/local/bin/composer install
 ```
 
 ## 2.Configuration
@@ -79,7 +79,7 @@ php translate.php
 ### 3.2 trough Docker
 run
 ```
-docker run -ti --rm -v $(pwd):/srv/pim -v ~/.composer:/var/www/.composer -v ~/.ssh:/var/www/.ssh -w /srv/pim akeneo/pim-php-dev:5.0 php translate.php
+docker run -ti --rm -v $(pwd):/srv/pim  -w /srv/pim webdevops/php-dev:8.0 php translate.php
 ```
 
 
