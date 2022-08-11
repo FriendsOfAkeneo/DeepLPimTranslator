@@ -8,8 +8,7 @@ use Akeneo\Pim\ApiClient\Exception\RuntimeException;
 use Akeneo\Pim\ApiClient\Exception\UnprocessableEntityHttpException;
 use Akeneo\Pim\ApiClient\Search\SearchBuilder;
 use Akeneo\Pim\ApiClient\Stream\UpsertResourceListResponse;
-use Akeneo\PimEnterprise\ApiClient\AkeneoPimEnterpriseClientBuilder;
-use App\Exception\UpsertException;
+use Akeneo\Pim\ApiClient\AkeneoPimClientBuilder;
 use App\Translator\DeeplTranslator;
 
 class PimOrchestrator
@@ -45,7 +44,7 @@ class PimOrchestrator
             static::PARAM_SCOPE_DESTINATION => $_SERVER['SCOPE_DESTINATION'],
         ];
 
-        $clientBuilder = new AkeneoPimEnterpriseClientBuilder($_SERVER['PIM_URL']);
+        $clientBuilder = new AkeneoPimClientBuilder($_SERVER['PIM_URL']);
         $this->client = $clientBuilder->buildAuthenticatedByPassword(
             $_SERVER['PIM_API_CLIENT_ID'],
             $_SERVER['PIM_API_CLIENT_SECRET'],
