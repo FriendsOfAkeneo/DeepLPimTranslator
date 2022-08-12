@@ -4,7 +4,8 @@
 namespace App\Translator;
 
 
-use BabyMarkt\DeepL\DeepL;
+
+use DeepL\Translator;
 
 class DeeplTranslator
 {
@@ -12,12 +13,12 @@ class DeeplTranslator
 
     public function __construct()
     {
-        $this->client = new DeepL($_SERVER['DEEPL_API_KEY']);
+        $this->client = new Translator($_SERVER['DEEPL_API_KEY']);
     }
 
-    public function translate($values = [], $localeFrom, $localeTo)
+    public function translate(array $values, $localeFrom, $localeTo)
     {
-        $translations = $this->client->translate(
+        $translations = $this->client->translateText(
             $values,
             $localeFrom,
             $localeTo
@@ -25,7 +26,7 @@ class DeeplTranslator
 
         $translated=[];
         foreach ($translations as $translation) {
-            $translated[] = $translation['text'];
+            $translated[] = $translation->text;
         }
 
         return $translated;

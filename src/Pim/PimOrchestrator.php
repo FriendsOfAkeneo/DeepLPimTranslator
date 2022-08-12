@@ -8,8 +8,7 @@ use Akeneo\Pim\ApiClient\Exception\RuntimeException;
 use Akeneo\Pim\ApiClient\Exception\UnprocessableEntityHttpException;
 use Akeneo\Pim\ApiClient\Search\SearchBuilder;
 use Akeneo\Pim\ApiClient\Stream\UpsertResourceListResponse;
-use Akeneo\PimEnterprise\ApiClient\AkeneoPimEnterpriseClientBuilder;
-use App\Exception\UpsertException;
+use Akeneo\Pim\ApiClient\AkeneoPimClientBuilder;
 use App\Translator\DeeplTranslator;
 
 class PimOrchestrator
@@ -41,11 +40,11 @@ class PimOrchestrator
             static::PARAM_LOCALE_DESTINATION => $_SERVER['LOCALE_DESTINATION'],
             static::PARAM_ATTRIBUTES => explode(',', $_SERVER['TARGET_ATTRIBUTES']),
             static::PARAM_SCOPE_SOURCE => $_SERVER['SCOPE_SOURCE'],
-            static::PARAM_CATEGORIES_SOURCE => explode(',', $_SERVER['CATEGORIES_SOURCE']),
+            static::PARAM_CATEGORIES_SOURCE => $_SERVER['CATEGORIES_SOURCE'] ? explode(',', $_SERVER['CATEGORIES_SOURCE']) : '',
             static::PARAM_SCOPE_DESTINATION => $_SERVER['SCOPE_DESTINATION'],
         ];
 
-        $clientBuilder = new AkeneoPimEnterpriseClientBuilder($_SERVER['PIM_URL']);
+        $clientBuilder = new AkeneoPimClientBuilder($_SERVER['PIM_URL']);
         $this->client = $clientBuilder->buildAuthenticatedByPassword(
             $_SERVER['PIM_API_CLIENT_ID'],
             $_SERVER['PIM_API_CLIENT_SECRET'],
@@ -74,7 +73,7 @@ class PimOrchestrator
             $searchBuilder = new SearchBuilder();
 
             $searchBuilder->addFilter($attribute, "NOT EMPTY", null, ['scope' => $this->pimAttributes[$attribute]['scopable'] ? $this->params[static::PARAM_SCOPE_SOURCE] : null, 'locale' => $this->params[static::PARAM_LOCALE_SOURCE]]);
-            $searchBuilder->addFilter($attribute, "EMPTY", null, ['scope' => $this->pimAttributes[$attribute]['scopable'] ? $this->params[static::PARAM_SCOPE_SOURCE] : null, 'locale' => $this->params[static::PARAM_LOCALE_DESTINATION]]);
+            $searchBuilder->addFilter($attribute, "EMPTY", null, ['scope' => $this->pimAttributes[$attribute]['scopable'] ? $this->params[static::PARAM_SCOPE_DESTINATION] : null, 'locale' => $this->params[static::PARAM_LOCALE_DESTINATION]]);
 
             if ($type == static::TYPE_PRODUCTS) {
                 $searchBuilder->addFilter('enabled', "=", true);
