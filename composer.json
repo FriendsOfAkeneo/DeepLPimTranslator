@@ -1,7 +1,7 @@
 {
     "require": {
         "php": ">=7.4",
-        "akeneo/api-php-client": "^9.0",
+        "akeneo/api-php-client": "^10.0",
         "php-http/guzzle6-adapter": "^2.0",
         "http-interop/http-factory-guzzle": "^1.0",
         "vlucas/phpdotenv": "^5.3",
