@@ -6,7 +6,7 @@
         "http-interop/http-factory-guzzle": "^1.0",
         "vlucas/phpdotenv": "^5.3",
         "ext-json": "*",
-        "deeplcom/deepl-php": "^0.4.0"
+        "deeplcom/deepl-php": "^1.2.1"
     },
     "autoload": {
         "psr-4": {
